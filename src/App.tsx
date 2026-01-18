@@ -7,7 +7,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ConvertPage />} />
+        <Route path="/convert" element={<ConvertPage />} />
         <Route path="/resume" element={<ResumePage />} />
         <Route path="/match" element={<MatchPage />} />
       </Routes>
