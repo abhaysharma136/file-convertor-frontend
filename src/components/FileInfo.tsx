@@ -4,11 +4,13 @@ type Props = {
   selectedFile: File;
   handleCancel: () => void;
   isConversionStart: boolean;
+  uploadType: string;
 };
 export default function FileInfo({
   selectedFile,
   handleCancel,
   isConversionStart,
+  uploadType,
 }: Props) {
   console.log("selected File", selectedFile);
 
@@ -28,13 +30,22 @@ export default function FileInfo({
         return "File";
     }
   };
+  const mainContainerStyle =
+    uploadType === "resume" ? "rounded-lg bg-muted" : "";
+
+  const iconContainerStyle =
+    uploadType === "resume" ? "bg-primary/10" : "bg-muted";
 
   const fileType = getFileTypeLabel(selectedFile);
   return (
-    <div className="w-full flex flex-col gap-4 border-gray-100">
+    <div
+      className={`w-full flex flex-col gap-4 border-gray-100 ${mainContainerStyle}`}
+    >
       <div className="shrink-0 p-5 flex items-center justify-between  rounded-md">
         <div className="flex w-[80%] justify-start items-center gap-4">
-          <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+          <div
+            className={`h-12 w-12 rounded-lg ${iconContainerStyle} flex items-center justify-center shrink-0`}
+          >
             <FileText className="h-8 w-8 text-primary" />
           </div>
 
@@ -42,9 +53,15 @@ export default function FileInfo({
             <h3 className="w-full truncate text-sm font-medium text-foreground text-left">
               {selectedFile?.name}
             </h3>
-            <p className="text-sm text-muted-foreground">
-              {fileType} Document • {(selectedFile.size / 1024).toFixed(2)} KB
-            </p>
+            {uploadType === "resume" ? (
+              <p className="text-sm text-muted-foreground">
+                {(selectedFile.size / 1024).toFixed(2)} KB
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {fileType} Document • {(selectedFile.size / 1024).toFixed(2)} KB
+              </p>
+            )}
           </div>
         </div>
 

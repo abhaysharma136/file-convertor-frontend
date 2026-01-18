@@ -5,14 +5,16 @@ import {
   fetchResumeAnalysisResult,
   startResumeAnalyzation,
 } from "../api/resumeApi";
-import StatusIndicator from "../components/StatusIndicator";
 import { useJobPolling } from "../hooks/useJobPolling";
 import { FileSearch, Loader2, Search } from "lucide-react";
 import AppLayout from "../layouts/AppLayout";
 import FileInfo from "../components/FileInfo";
 import ActionButton from "../components/ActionButton";
 import ATSScoreCard from "../components/ATSScoreCard";
-import ImprovementsList from "../components/ImprovementsList";
+import ImprovementsList, {
+  type Suggestion,
+} from "../components/ImprovementsList";
+import StatusIndicator from "../components/StatusIndicator";
 
 const MAX_FILE_SIZE_MB = 5;
 type result = {
@@ -26,7 +28,7 @@ type result = {
   };
   suggestion_source: string;
   ai_suggestions: {
-    suggestions: string[];
+    suggestions: Suggestion[];
     rewritten_bullets: string[];
     missing_keywords: string[];
     severity: string;
@@ -39,58 +41,10 @@ type data = {
   download_url: string;
   error: string;
 };
-const dummyresult = {
-  ats_score: 66,
-
-  issues: ["Low technical skill coverage"],
-
-  breakdown: {
-    sections: 28,
-
-    skills: 5,
-
-    experience: 18,
-
-    length: 15,
-  },
-
-  suggestion_source: "ai",
-
-  ai_suggestions: {
-    suggestions: [
-      {
-        title: "Weak Experience Bullet Points",
-
-        description:
-          "Rewrite experience bullets using strong action verbs and measurable impact (e.g., performance gains, scale, users, revenue).",
-
-        severity: "moderate",
-
-        category: "experience",
-      },
-    ],
-
-    rewritten_bullets: [
-      "Led end-to-end development of scalable features, improving system performance and reliability.",
-    ],
-
-    missing_keywords: [
-      "docker",
-
-      "kubernetes",
-
-      "microservices",
-
-      "rest api",
-
-      "ci/cd",
-    ],
-  },
-};
 
 export default function ResumePage() {
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(
-    null
+    null,
   );
 
   const [jobId, setJobId] = useState<string | null>(null);
@@ -178,7 +132,8 @@ export default function ResumePage() {
     setResult(null);
   };
 
-  const isJobRunning = status === "uploading" || status === "processing";
+  const isJobRunning =
+    status === "uploading" || status === "processing" || status === "pending";
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-start gap-8">
@@ -201,23 +156,31 @@ export default function ResumePage() {
               onFileSelect={handleFileChange}
               onError={setError}
               disabled={isUploading || status === "processing"}
+              uploadType="resume"
             />
           ) : (
             <div className="w-full max-w-2xl flex flex-col gap-4">
-              <FileInfo selectedFile={selectedFile} handleCancel={removeFile} />
-              <ActionButton
-                buttonIcon={
-                  isUploading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Search className="mr-2 h-4 w-4" />
-                  )
-                }
-                buttonText={isJobRunning ? "Analyzing..." : "Analyze Resume"}
-                handleClick={handleUpload}
-                isDisabled={isJobRunning}
-                type="cta"
+              <FileInfo
+                selectedFile={selectedFile}
+                handleCancel={removeFile}
+                isConversionStart={!!status}
+                uploadType="resume"
               />
+              {status === "completed" ? null : (
+                <ActionButton
+                  buttonIcon={
+                    isJobRunning ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="mr-2 h-4 w-4" />
+                    )
+                  }
+                  buttonText={isJobRunning ? "Analyzing..." : "Analyze Resume"}
+                  handleClick={handleUpload}
+                  isDisabled={isJobRunning}
+                  type="cta"
+                />
+              )}
             </div>
           )}
         </div>
@@ -229,17 +192,27 @@ export default function ResumePage() {
           {isUploading ? "Uploading..." : "Analyze Resume"}
         </button> */}
 
-        <StatusIndicator status={status} error={error} />
+        {error ? <StatusIndicator status={status} error={error} /> : null}
 
         {/* RESUME RESULTS */}
         {result ? (
-          <div className="w-full max-w-2xl flex flex-col gap-6">
+          <div
+            className="w-full max-w-2xl flex flex-col gap-6 transition-all duration-500 ease-out
+      opacity-0 translate-y-6
+      animate-fade-in-up"
+          >
             <ATSScoreCard score={result?.ats_score} />{" "}
             <ImprovementsList
               suggestions={result.ai_suggestions.suggestions}
               rewrittenBullets={result.ai_suggestions.rewritten_bullets}
               missingKeywords={result.ai_suggestions.missing_keywords}
             />
+            <button
+              onClick={removeFile}
+              className="w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Analyze another resume
+            </button>
           </div>
         ) : null}
         {/* {result && (
@@ -278,6 +251,10 @@ export default function ResumePage() {
             </p>
           </div>
         )} */}
+        {/* Footer */}
+        <p className="text-center text-xs text-muted-foreground mt-8">
+          Your resume is processed securely and deleted in 30 minutes
+        </p>
       </div>
     </AppLayout>
   );

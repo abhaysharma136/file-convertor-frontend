@@ -1,6 +1,4 @@
-import { AlertCircle, CheckCircle } from "lucide-react";
-
-export default function JDMatchScoreCard({ score }) {
+export default function JDMatchScoreCard({ score }: { score: number }) {
   const getProgressBarColor = () => {
     if (score >= 80) return "bg-green-600";
     if (score >= 60) return "bg-orange-600";

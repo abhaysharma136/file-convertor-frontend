@@ -4,7 +4,7 @@ import Dropzone from "../components/Dropzone";
 import { fetchJdMatchResult, startJdMatch } from "../api/matchApi";
 import StatusIndicator from "../components/StatusIndicator";
 import { useJobPolling } from "../hooks/useJobPolling";
-import { FileSearch, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import AppLayout from "../layouts/AppLayout";
 import FileInfo from "../components/FileInfo";
 import ActionButton from "../components/ActionButton";
@@ -18,6 +18,7 @@ type result = {
   match_score: number;
   matched_keywords: string[];
   missing_keywords: string[];
+  suggestions: string[];
 };
 type data = {
   job_id: string;
@@ -26,19 +27,9 @@ type data = {
   error: string;
 };
 
-const mockResult = {
-  match_score: 60,
-  matched_keywords: ["react", "aws", "ci/cd"],
-  missing_keywords: ["microservices", "scalability"],
-  suggestions: [
-    "this is the first suggestion",
-    "this is the second suggestion",
-    "this is the third suggestion",
-  ],
-};
 export default function MatchPage() {
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(
-    null
+    null,
   );
 
   const [jobId, setJobId] = useState<string | null>(null);
@@ -128,14 +119,23 @@ export default function MatchPage() {
     setJDText("");
   };
 
-  const isJobRunning = status === "uploading" || status === "processing";
+  const isJobRunning =
+    status === "uploading" || status === "processing" || status === "pending";
+
+  const jdTextCount = (text: string) => {
+    if (text && text.length >= 50) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-start gap-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-4">
+          {/* <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-4">
             <FileSearch className="h-6 w-6 text-primary" />
-          </div>
+          </div> */}
 
           <h2 className="text-3xl font-semibold">Job Description Match</h2>
           <p className="mt-2 text-muted-foreground">
@@ -151,16 +151,22 @@ export default function MatchPage() {
               onFileSelect={handleFileChange}
               onError={setError}
               disabled={isUploading || status === "processing"}
+              uploadType="resume"
             />
           ) : (
-            <FileInfo selectedFile={selectedFile} handleCancel={removeFile} />
+            <FileInfo
+              selectedFile={selectedFile}
+              handleCancel={removeFile}
+              isConversionStart={!!status}
+              uploadType="resume"
+            />
           )}
         </div>
         {selectedFile ? (
           <div className="w-full max-w-2xl flex flex-col justify-center items-start gap-4">
             <div className="w-full flex flex-col justify-center items-start gap-4">
               <label className="text-sm font-medium">Job Description</label>
-              <div className="w-full flex flex-col items-start justify-center w-74 border-gray-200 shadow-sm gap-2">
+              <div className="w-full flex flex-col items-start justify-center  border-gray-200 shadow-sm gap-2">
                 <textarea
                   onChange={(e) => setJDText(e.target.value)}
                   className="w-full min-h-50 resize-none  focus:outline-blue-800 rounded-md p-2.5"
@@ -184,12 +190,12 @@ export default function MatchPage() {
           {isUploading ? "Uploading..." : "Match JD"}
         </button> */}
 
-        <StatusIndicator status={status} error={error} />
+        {error ? <StatusIndicator status={status} error={error} /> : null}
         {selectedFile ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 w-full max-w-2xl">
             <ActionButton
               buttonIcon={
-                isUploading ? (
+                isJobRunning ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   ""
@@ -197,7 +203,7 @@ export default function MatchPage() {
               }
               buttonText={isJobRunning ? "Analyzing..." : "Match Resume"}
               handleClick={handleUpload}
-              isDisabled={isJobRunning}
+              isDisabled={!selectedFile || jdTextCount(jdText) || isJobRunning}
               type="cta"
             />
           </div>
@@ -224,14 +230,28 @@ export default function MatchPage() {
           </div>
         )} */}
         {result ? (
-          <div className="w-full max-w-2xl flex flex-col gap-6">
-            <JDMatchScoreCard score={mockResult?.match_score} />
-            <KeywordAnalysis matchResult={mockResult} />
+          <div
+            className="w-full max-w-2xl flex flex-col gap-6 transition-all duration-500 ease-out
+      opacity-0 translate-y-6
+      animate-fade-in-up"
+          >
+            <JDMatchScoreCard score={result?.match_score} />
+            <KeywordAnalysis matchResult={result} />
             {result?.suggestions ? (
               <JDSuggestions suggestions={result?.suggestions} />
             ) : null}
+            <button
+              onClick={removeFile}
+              className="w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Analyze another resume
+            </button>
           </div>
         ) : null}
+        {/* Footer */}
+        <p className="text-center text-xs text-muted-foreground mt-8">
+          Your resume is processed securely and deleted in 30 minutes
+        </p>
       </div>
     </AppLayout>
   );

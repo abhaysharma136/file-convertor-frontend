@@ -85,7 +85,7 @@ export default function ImprovementsList({
           return (
             <div
               key={index}
-              className={`p-4 rounded-lg bg-white border border-gray-100 border-l-4 ${getSeverityBorder(
+              className={`p-4 rounded-lg bg-card border border-gray-100 border-l-4 ${getSeverityBorder(
                 item.severity
               )}`}
             >
@@ -119,7 +119,7 @@ export default function ImprovementsList({
 
       {/* Missing Keywords */}
       {missingKeywords.length > 0 && (
-        <div className="rounded-lg border border-gray-100 p-4">
+        <div className="rounded-lg border bg-card border-gray-100 p-4">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="h-4 w-4 text-orange-600" />
             <h3 className="text-sm font-medium">Missing Keywords</h3>
@@ -139,7 +139,7 @@ export default function ImprovementsList({
 
       {/* Rewritten Bullets */}
       {rewrittenBullets.length > 0 && (
-        <div className="rounded-lg border border-gray-100 p-4">
+        <div className="rounded-lg border border-gray-100 p-4 bg-card">
           <div className="flex items-center gap-2 mb-2">
             <Lightbulb className="h-4 w-4 text-green-600" />
             <h3 className="text-sm font-medium">Suggested Rewrites</h3>

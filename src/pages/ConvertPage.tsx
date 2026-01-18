@@ -29,7 +29,7 @@ type SelectOption = {
 
 export default function ConvertPage() {
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(
-    null
+    null,
   );
   const [targetFormat, setTargetFormat] = useState<string | null>(null);
 
@@ -151,6 +151,7 @@ export default function ConvertPage() {
                 selectedFile={selectedFile}
                 handleCancel={removeFile}
                 isConversionStart={!!status}
+                uploadType="converter"
               />
             </div>
           )}
@@ -239,9 +240,7 @@ export default function ConvertPage() {
                       ""
                     )
                   }
-                  buttonText={
-                    isJobRunning ? "Processing..." : "Convert Another"
-                  }
+                  buttonText="Convert Another"
                   handleClick={removeFile}
                   isDisabled={isJobRunning}
                   type="secondary"

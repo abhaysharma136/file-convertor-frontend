@@ -115,7 +115,7 @@ export default function Dropzone({
               {["PDF", "DOC", "DOCX"].map((format) => (
                 <span
                   key={format}
-                  className="rounded bg-gray-200 font-medium text-xs px-2 py-0.5 text-gray-400"
+                  className="rounded bg-gray-200 font-medium text-xs px-2 py-0.5 text-muted-foreground"
                 >
                   {format}
                 </span>
