@@ -119,7 +119,10 @@ export default function ConvertPage() {
     }
   }, [downloadUrl]);
 
-  console.log("selected:", targetFormat);
+  useEffect(() => {
+    localStorage.setItem("lastService", "convert");
+  }, []);
+
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-start gap-6">

@@ -7,6 +7,9 @@
     --color-muted: hsl(220 14% 96%);
     --color-background: hsl(210 20% 98%);
     --color-card: hsl(0 0% 100%);
+    --color-primary-foreground: hsl(0 0% 100%);
+    --color-accent: hsl(142 60% 45%);
+    --color-border: hsl(220 13% 91%)
 }
 
 
@@ -25,4 +28,20 @@
 
 .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out forwards;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 0px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
 }

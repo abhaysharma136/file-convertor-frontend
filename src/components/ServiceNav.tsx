@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { FileText, FileSearch, GitCompare } from "lucide-react";
 
 const navItems = [
@@ -8,7 +8,7 @@ const navItems = [
     icon: FileText,
   },
   {
-    to: "/resume",
+    to: "/resume-analyzer",
     label: "ATS Analyzer",
     icon: FileSearch,
   },
@@ -21,8 +21,17 @@ const navItems = [
 
 export default function ServiceNav() {
   return (
-    <nav className="w-full border-b border-gray-200 bg-white">
-      <div className="max-w-4xl mx-auto px-4">
+    <nav className="w-full border-b border-gray-200 bg-white/10 sticky top-0 backdrop-blur-sm z-50">
+      <div className="mx-auto px-4 flex items-center justify-between">
+        <Link to="/">
+          <div className="flex items-center gap-2">
+            {/* <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <FileSearch className="h-4 w-4 text-primary-foreground" />
+            </div> */}
+            <span className="font-semibold text-primary">Applyra</span>
+          </div>
+        </Link>
+
         <div className="flex items-center gap-6 h-14">
           {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
@@ -41,7 +50,7 @@ export default function ServiceNav() {
               }
             >
               <Icon className="h-4 w-4" />
-              {label}
+              <span className="hidden sm:inline">{label}</span>
             </NavLink>
           ))}
         </div>

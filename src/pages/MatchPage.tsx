@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../App.css";
 import Dropzone from "../components/Dropzone";
 import { fetchJdMatchResult, startJdMatch } from "../api/matchApi";
@@ -128,6 +128,9 @@ export default function MatchPage() {
     }
     return true;
   };
+  useEffect(() => {
+    localStorage.setItem("lastService", "match");
+  }, []);
 
   return (
     <AppLayout>

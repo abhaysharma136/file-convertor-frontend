@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../App.css";
 import Dropzone from "../components/Dropzone";
 import {
@@ -134,6 +134,11 @@ export default function ResumePage() {
 
   const isJobRunning =
     status === "uploading" || status === "processing" || status === "pending";
+
+  useEffect(() => {
+    localStorage.setItem("lastService", "resume");
+  }, []);
+
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-start gap-8">

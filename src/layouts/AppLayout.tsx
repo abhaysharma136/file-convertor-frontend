@@ -13,7 +13,7 @@ export default function AppLayout({ children }: Props) {
       <ServiceNav />
       {/* MAIN CONTENT */}
       <main className="flex-1 flex justify-center px-4 py-8">
-        <div className="w-full max-w-4xl">{children}</div>
+        <div className="w-full ">{children}</div>
       </main>
 
       {/* FOOTER */}
