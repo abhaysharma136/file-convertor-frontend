@@ -7,6 +7,14 @@ export async function startConversion(file: File, targetFormat: string) {
     method: "POST",
     body: formData,
   });
+  const data = await res.json();
 
-  return res.json();
+  // 🔥 THROW ON RATE LIMIT
+  if (!res.ok) {
+    const error: any = new Error(data.detail || "Request failed");
+    error.status = res.status;
+    throw error;
+  }
+
+  return data;
 }

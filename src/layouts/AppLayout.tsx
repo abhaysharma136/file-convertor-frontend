@@ -15,7 +15,6 @@ export default function AppLayout({ children }: Props) {
       <main className="flex-1 flex justify-center px-4 py-8">
         <div className="w-full ">{children}</div>
       </main>
-
       {/* FOOTER */}
     </div>
   );

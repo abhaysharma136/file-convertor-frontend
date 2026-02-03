@@ -10,6 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import Footer from "../components/Footer";
 
 const benefits = [
   { icon: Shield, text: "Secure & Private" },
@@ -141,12 +142,7 @@ export default function HomePage() {
         </section>
         {/* Trust */}
       </div>
-      <footer className="border-t border-border py-6 text-center space-y-2 text-xs text-muted-foreground">
-        <p>
-          Private by design • Files deleted in 30 minutes • No signup required
-        </p>
-        <p>© {new Date().getFullYear()} Applyra</p>
-      </footer>
+      <Footer />
     </AppLayout>
   );
 }
