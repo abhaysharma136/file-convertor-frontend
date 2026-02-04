@@ -12,6 +12,7 @@ import JDMatchScoreCard from "../components/JDMatchScoreCard";
 import KeywordAnalysis from "../components/KeywordAnalysis";
 import JDSuggestions from "../components/JDSuggestions";
 import toast from "react-hot-toast";
+import { fetchServiceQuota } from "../api/quotaApi";
 
 const MAX_FILE_SIZE_MB = 5;
 
@@ -104,14 +105,19 @@ export default function MatchPage() {
     if (jdText.length < 50) return;
 
     // 🚫 BLOCKED: no free + no credits
-    if (usage.remaining_free === 0 && usage.credits_left === 0) {
+    if (usage && usage.remaining_free === 0 && usage.credits_left === 0) {
       setUpgradeReason("quota_exhausted");
       setShowUpgradeModal(true);
       return;
     }
 
     // ⚠️ Free exhausted, credits available → confirmation
-    if (usage.remaining_free === 0 && usage.credits_left > 0 && !useCredit) {
+    if (
+      usage &&
+      usage.remaining_free === 0 &&
+      usage.credits_left > 0 &&
+      !useCredit
+    ) {
       setUpgradeReason("confirm_credit");
       setShowUpgradeModal(true);
       return;
@@ -132,10 +138,6 @@ export default function MatchPage() {
           ...data.usage,
         }));
       }
-    } catch (err) {
-      // 🔴 RATE LIMIT
-
-      setError("Upload failed. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -192,11 +194,12 @@ export default function MatchPage() {
       : usage!.remaining_free > 0
         ? "Analyze Resume (Free)"
         : "Analyze Resume (1 Credit)";
+
   useEffect(() => {
     async function loadUsage() {
-      const res = await fetch("http://localhost:8000/usage/jd_match");
-      const data = await res.json();
-      setUsage(data);
+      const res = await fetchServiceQuota("jd_match");
+
+      setUsage(res);
     }
 
     loadUsage();
@@ -410,7 +413,17 @@ export default function MatchPage() {
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">
           Powered by{" "}
-          <span className="font-medium text-foreground">Applyra AI</span>
+          <span className="font-medium text-foreground">Applyra</span>
+        </p>
+        <p className="text-center text-xs text-muted-foreground mt-1">
+          Files are deleted within 30 minutes ·{" "}
+          <a href="/privacy" className="underline">
+            Privacy
+          </a>{" "}
+          ·{" "}
+          <a href="/terms" className="underline">
+            Terms
+          </a>
         </p>
       </div>
     </AppLayout>

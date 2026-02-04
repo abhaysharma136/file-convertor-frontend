@@ -9,7 +9,7 @@ import {
   Zap,
   CheckCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+
 import Footer from "../components/Footer";
 
 const benefits = [
@@ -19,11 +19,8 @@ const benefits = [
 ];
 
 export default function HomePage() {
-  const [lastService, setLastService] = useState<string | null>(null);
-  useEffect(() => {
-    const stored = localStorage.getItem("lastService");
-    setLastService(stored);
-  }, []);
+  const lastService = localStorage.getItem("lastService");
+
   return (
     <AppLayout>
       <div className="flex flex-col gap-10 items-center text-center">

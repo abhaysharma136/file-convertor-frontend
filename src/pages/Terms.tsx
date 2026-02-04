@@ -49,10 +49,10 @@ export default function Terms() {
           <p>
             Email:{" "}
             <a
-              href="mailto:support@applyra.ai"
+              href="mailto:support@applyra.in"
               className="text-blue-600 underline"
             >
-              support@applyra.ai
+              support@applyra.in
             </a>
           </p>
         </section>

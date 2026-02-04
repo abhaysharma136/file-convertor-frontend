@@ -1,3 +1,6 @@
+export interface ApiError extends Error {
+  status: number;
+}
 export async function startJdMatch(
   file: File,
   jdText: string,
@@ -16,7 +19,9 @@ export async function startJdMatch(
 
   // 🔥 THROW ON RATE LIMIT
   if (!res.ok) {
-    const error: any = new Error(data.detail || "Request failed");
+    const error = new Error(
+      typeof data.detail === "string" ? data.detail : "Request failed",
+    ) as ApiError;
     error.status = res.status;
     throw error;
   }

@@ -16,6 +16,7 @@ import ImprovementsList, {
 } from "../components/ImprovementsList";
 import StatusIndicator from "../components/StatusIndicator";
 import toast from "react-hot-toast";
+import { fetchServiceQuota } from "../api/quotaApi";
 
 const MAX_FILE_SIZE_MB = 5;
 type result = {
@@ -115,14 +116,19 @@ export default function ResumePage() {
     if (!selectedFile) return;
 
     // 🚫 BLOCKED: no free + no credits
-    if (usage.remaining_free === 0 && usage.credits_left === 0) {
+    if (usage && usage.remaining_free === 0 && usage.credits_left === 0) {
       setUpgradeReason("quota_exhausted");
       setShowUpgradeModal(true);
       return;
     }
 
     // ⚠️ Free exhausted, credits available → confirmation
-    if (usage.remaining_free === 0 && usage.credits_left > 0 && !useCredit) {
+    if (
+      usage &&
+      usage.remaining_free === 0 &&
+      usage.credits_left > 0 &&
+      !useCredit
+    ) {
       setUpgradeReason("confirm_credit");
       setShowUpgradeModal(true);
       return;
@@ -195,9 +201,9 @@ export default function ResumePage() {
 
   useEffect(() => {
     async function loadUsage() {
-      const res = await fetch("http://localhost:8000/usage/resume");
-      const data = await res.json();
-      setUsage(data);
+      const res = await fetchServiceQuota("resume");
+
+      setUsage(res);
     }
 
     loadUsage();
@@ -212,7 +218,7 @@ export default function ResumePage() {
     <AppLayout>
       <div className="flex flex-col items-center justify-start gap-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-3xl font-semibold text-foreground">
             Resume ATS Analyzer
           </h2>
           <p className="mt-2 text-muted-foreground">
@@ -227,7 +233,7 @@ export default function ResumePage() {
             </p>
           )}
         </div>
-        <div className="w-full max-w-2xl rounded-xl bg-white border border-gray-50 p-6 shadow-sm">
+        <div className="w-full max-w-2xl rounded-xl bg-white border border-gray-50  shadow-sm">
           {!selectedFile ? (
             <Dropzone
               selectedFile={selectedFile}
@@ -393,7 +399,7 @@ export default function ResumePage() {
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">
           Powered by{" "}
-          <span className="font-medium text-foreground">Applyra AI</span>
+          <span className="font-medium text-foreground">Applyra</span>
         </p>
         <p className="text-center text-xs text-muted-foreground mt-1">
           Files are deleted within 30 minutes ·{" "}

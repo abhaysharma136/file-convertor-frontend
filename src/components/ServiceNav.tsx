@@ -19,13 +19,13 @@ const navItems = [
   },
 ];
 
-const handleAddCredit = async () => {
-  const res = await fetch("http://localhost:8000/admin/add-credits?amount=10", {
-    method: "POST",
-  });
-  const data = await res.json();
-  alert(data?.message);
-};
+// const handleAddCredit = async () => {
+//   const res = await fetch("http://localhost:8000/admin/add-credits?amount=10", {
+//     method: "POST",
+//   });
+//   const data = await res.json();
+//   alert(data?.message);
+// };
 export default function ServiceNav() {
   return (
     <nav className="w-full border-b border-gray-200 bg-white/10 sticky top-0 backdrop-blur-sm z-50">
@@ -38,12 +38,12 @@ export default function ServiceNav() {
             <span className="font-semibold text-primary">Applyra</span>
           </div>
         </Link>
-        <button
+        {/* <button
           className="bg-blue-700 text-white cursor-pointer"
           onClick={() => handleAddCredit()}
         >
           Add Credit +10
-        </button>
+        </button> */}
         <div className="flex items-center gap-6 h-14">
           {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink

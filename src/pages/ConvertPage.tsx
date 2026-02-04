@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "../App.css";
 import Dropzone from "../components/Dropzone";
-import { startConversion } from "../api/convertApi";
+import { startConversion, type ApiError } from "../api/convertApi";
 import StatusIndicator from "../components/StatusIndicator";
 import { useJobPolling } from "../hooks/useJobPolling";
 import AppLayout from "../layouts/AppLayout";
@@ -16,7 +16,7 @@ import FileInfo from "../components/FileInfo";
 import Select from "react-select";
 import ActionButton from "../components/ActionButton";
 import toast from "react-hot-toast";
-import { type Service } from "../utils/utils";
+import { fetchServiceQuota } from "../api/quotaApi";
 
 export type data = {
   job_id: string;
@@ -110,11 +110,12 @@ export default function ConvertPage() {
         }));
       }
     } catch (err) {
+      const apiError = err as ApiError;
       // 🔴 RATE LIMIT
-      if (err.status === 429) {
+      if (apiError.status === 429) {
         toast.error("Free limit reached for today");
         setShowUpgradeModal(true);
-        setStatus(err.detail);
+        setStatus(apiError.detail);
       } else {
         setError("Upload failed. Please try again.");
       }
@@ -168,15 +169,15 @@ export default function ConvertPage() {
 
   const buttonText = isJobRunning
     ? "Analyzing..."
-    : usage?.remaining_free > 0
+    : usage && usage?.remaining_free > 0
       ? "Convert File (Free)"
       : "Convert File";
 
   useEffect(() => {
     async function loadUsage() {
-      const res = await fetch("http://localhost:8000/usage/convert");
-      const data = await res.json();
-      setUsage(data);
+      const res = await fetchServiceQuota("convert");
+
+      setUsage(res);
     }
 
     loadUsage();
@@ -369,7 +370,17 @@ export default function ConvertPage() {
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">
           Powered by{" "}
-          <span className="font-medium text-foreground">Applyra AI</span>
+          <span className="font-medium text-foreground">Applyra</span>
+        </p>
+        <p className="text-center text-xs text-muted-foreground mt-1">
+          Files are deleted within 30 minutes ·{" "}
+          <a href="/privacy" className="underline">
+            Privacy
+          </a>{" "}
+          ·{" "}
+          <a href="/terms" className="underline">
+            Terms
+          </a>
         </p>
       </div>
     </AppLayout>
