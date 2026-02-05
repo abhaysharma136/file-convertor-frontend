@@ -17,10 +17,11 @@ interface BackendErrorResponse {
     available_services?: string[];
   };
 }
+const Base = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 export async function fetchServiceQuota(
   service: string,
 ): Promise<ServiceQuotaResponse> {
-  const res = await fetch(`http://localhost:8000/usage/${service}`);
+  const res = await fetch(`${Base}/usage/${service}`);
   const data = (await res.json()) as
     | ServiceQuotaResponse
     | BackendErrorResponse;
