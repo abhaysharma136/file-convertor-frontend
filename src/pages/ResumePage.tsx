@@ -233,7 +233,7 @@ export default function ResumePage() {
             </p>
           )}
         </div>
-        <div className="w-full max-w-2xl rounded-xl bg-white border border-gray-50  shadow-sm">
+        <div className="w-full max-w-2xl rounded-xl bg-white border border-gray-50 shadow-sm">
           {!selectedFile ? (
             <Dropzone
               selectedFile={selectedFile}
@@ -243,7 +243,7 @@ export default function ResumePage() {
               uploadType="resume"
             />
           ) : (
-            <div className="w-full max-w-2xl flex flex-col gap-4">
+            <div className="w-full max-w-2xl flex flex-col gap-4 p-6">
               <FileInfo
                 selectedFile={selectedFile}
                 handleCancel={removeFile}

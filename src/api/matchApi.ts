@@ -1,6 +1,7 @@
 export interface ApiError extends Error {
   status: number;
 }
+const Base = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 export async function startJdMatch(
   file: File,
   jdText: string,
@@ -10,7 +11,7 @@ export async function startJdMatch(
   formData.append("file", file);
   formData.append("job_description", jdText);
   formData.append("useCredit", useCredit ? "true" : "false");
-  const res = await fetch("http://localhost:8000/jd/match", {
+  const res = await fetch(`${Base}/jd/match`, {
     method: "POST",
     body: formData,
   });
@@ -30,7 +31,7 @@ export async function startJdMatch(
 }
 
 export async function fetchJdMatchResult(jobId: string | null) {
-  const res = await fetch(`http://localhost:8000/jd/match/result/${jobId}`, {
+  const res = await fetch(`${Base}/jd/match/result/${jobId}`, {
     method: "GET",
   });
   return res.json();
