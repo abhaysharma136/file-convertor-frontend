@@ -1,5 +1,5 @@
 import { Info } from "lucide-react";
-interface Suggestion {
+export interface Suggestion {
   title?: string;
   description?: string;
   severity?: string;

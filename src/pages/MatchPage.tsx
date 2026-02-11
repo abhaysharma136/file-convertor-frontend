@@ -10,7 +10,7 @@ import FileInfo from "../components/FileInfo";
 import ActionButton from "../components/ActionButton";
 import JDMatchScoreCard from "../components/JDMatchScoreCard";
 import KeywordAnalysis from "../components/KeywordAnalysis";
-import JDSuggestions from "../components/JDSuggestions";
+import JDSuggestions, { type Suggestion } from "../components/JDSuggestions";
 import toast from "react-hot-toast";
 import { fetchServiceQuota } from "../api/quotaApi";
 
@@ -20,7 +20,7 @@ type result = {
   match_score: number;
   matched_keywords: string[];
   missing_keywords: string[];
-  suggestions: string[];
+  suggestions: Suggestion[];
   suggestion_source: string;
 };
 type data = {
