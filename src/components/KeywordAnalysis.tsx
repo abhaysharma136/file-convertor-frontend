@@ -1,6 +1,15 @@
 import { AlertCircle, CheckCircle } from "lucide-react";
+interface MatchResult {
+  match_score: number
+  matched_keywords: string[]
+  missing_keywords: string[]
+}
 
-export default function KeywordAnalysis({ matchResult }) {
+interface Props {
+  matchResult: MatchResult
+}
+
+export default function KeywordAnalysis({ matchResult }:Props) {
   return (
     <div>
       {/* Keywords Analysis */}
