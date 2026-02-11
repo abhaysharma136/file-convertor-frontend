@@ -36,6 +36,7 @@ type UsageState = {
   credits_left: number;
   can_run: boolean;
 };
+const Base = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 export default function ConvertPage() {
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(
     null,
@@ -129,7 +130,7 @@ export default function ConvertPage() {
     jobId,
     onUpdate: setStatus,
     onCompleted: (data: data) => {
-      setDownloadUrl(`http://localhost:8000${data.download_url}`);
+      setDownloadUrl(`${Base}${data.download_url}`);
 
       toast.success("Conversion completed successfully!");
       setPhase("done"); // 🔥 THIS controls UI now
