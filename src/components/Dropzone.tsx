@@ -1,5 +1,5 @@
 import { Upload } from "lucide-react";
-import { useState } from "react";
+// import { useState } from "react";
 
 const MAX_FILE_SIZE_MB = 5;
 type Props = {
@@ -16,7 +16,7 @@ export default function Dropzone({
   disabled = false,
   uploadType,
 }: Props) {
-  const [isDragging, setIsDragging] = useState(false);
+  // const [isDragging, setIsDragging] = useState(false);
 
   const validateFile = (file: File | null | undefined) => {
     if (!file) return "No file selected";
@@ -47,11 +47,11 @@ export default function Dropzone({
   };
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(true);
+    // setIsDragging(true);
   };
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(false);
+    // setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) {
       handleFile(file);
@@ -84,7 +84,7 @@ export default function Dropzone({
     hover:border-blue-500 hover:bg-gray-50
   "
         onDragOver={handleDragOver}
-        onDragLeave={() => setIsDragging(false)}
+        // onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         onClick={() => handleFileInputClick()}
       >
