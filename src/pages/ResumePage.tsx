@@ -22,6 +22,7 @@ const MAX_FILE_SIZE_MB = 5;
 type result = {
   ats_score: number;
   issues: string[];
+  optimization_tips: string[];
   breakdown: {
     sections: number;
     skills: number;
@@ -33,6 +34,7 @@ type result = {
     suggestions: Suggestion[];
     rewritten_bullets: string[];
     missing_keywords: string[];
+
     severity: string;
   };
 };
@@ -332,6 +334,7 @@ export default function ResumePage() {
               suggestions={result.ai_suggestions.suggestions}
               rewrittenBullets={result.ai_suggestions.rewritten_bullets}
               missingKeywords={result.ai_suggestions.missing_keywords}
+              optimizationTips={result.optimization_tips}
             />
             <button
               onClick={removeFile}
