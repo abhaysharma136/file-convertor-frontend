@@ -20,12 +20,14 @@ interface ImprovementsListProps {
   suggestions: Suggestion[];
   rewrittenBullets?: string[];
   missingKeywords?: string[];
+  optimizationTips?: string[];
 }
 
 export default function ImprovementsList({
   suggestions,
   rewrittenBullets = [],
   missingKeywords = [],
+  optimizationTips = [],
 }: ImprovementsListProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -75,10 +77,12 @@ export default function ImprovementsList({
     <div className="space-y-6">
       {/* Suggestions */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-4 w-4 text-blue-600" />
-          <h3 className="text-sm font-medium">Suggested Improvements</h3>
-        </div>
+        {suggestions.length !== 0 && optimizationTips.length === 0 ? (
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-4 w-4 text-blue-600" />
+            <h3 className="text-sm font-medium">Suggested Improvements</h3>
+          </div>
+        ) : null}
 
         {suggestions.map((item, index) => {
           const label = getSeverityLabel(item.severity);
@@ -86,7 +90,7 @@ export default function ImprovementsList({
             <div
               key={index}
               className={`p-4 rounded-lg bg-card border border-gray-100 border-l-4 ${getSeverityBorder(
-                item.severity
+                item.severity,
               )}`}
             >
               <div className="flex items-start gap-3">
@@ -168,9 +172,43 @@ export default function ImprovementsList({
           </div>
         </div>
       )}
+      {/* Optimization Suggestions */}
+      {optimizationTips.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-4 w-4 text-blue-600" />
+            <h3 className="text-sm font-medium">Optimization Suggestions</h3>
+          </div>
+
+          {optimizationTips.map((tip, index) => (
+            <div
+              key={index}
+              className="p-4 rounded-lg bg-card border border-gray-100 border-l-4 border-l-blue-600"
+            >
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5">
+                  <Info className="h-4 w-4 text-blue-600" />
+                </div>
+
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <p className="text-sm font-semibold">Advanced Refinement</p>
+
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600/10 text-blue-600">
+                      Optimization
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-gray-600 text-left">{tip}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Perfect Resume */}
-      {suggestions.length === 0 && (
+      {suggestions.length === 0 && optimizationTips.length === 0 && (
         <div className="flex items-center gap-2 p-4 rounded-lg bg-green-100 border border-green-300">
           <Check className="h-5 w-5 text-green-600" />
           <p className="text-sm">Your resume is well optimized for ATS.</p>
