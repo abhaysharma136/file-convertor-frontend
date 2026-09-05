@@ -1,18 +1,15 @@
 interface ATSScoreCardProps {
   score: number;
+  strengthLevel: string;
 }
-export default function ATSScoreCard({ score }: ATSScoreCardProps) {
+export default function ATSScoreCard({
+  score,
+  strengthLevel,
+}: ATSScoreCardProps) {
   const getScoreColor = () => {
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-orange-600";
     return "text-red-600";
-  };
-
-  const getScoreLabel = () => {
-    if (score >= 80) return "Excellent";
-    if (score >= 60) return "Good";
-    if (score >= 40) return "Needs Work";
-    return "Poor";
   };
 
   const getScoreBg = () => {
@@ -37,7 +34,7 @@ export default function ATSScoreCard({ score }: ATSScoreCardProps) {
         <span className={`text-3xl font-bold ${getScoreColor()}`}>{score}</span>
       </div>
       <p className={`mt-3 text-sm font-medium ${getScoreColor()}`}>
-        {getScoreLabel()}
+        {strengthLevel}
       </p>
       <div className="mt-4 w-full bg-gray-50 rounded-full h-2">
         <div
