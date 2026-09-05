@@ -1,23 +1,23 @@
-import { Link, NavLink } from "react-router-dom";
-import { FileText, FileSearch, GitCompare } from "lucide-react";
+import { Link } from "react-router-dom";
+// import { FileText, FileSearch, GitCompare } from "lucide-react";
 
-const navItems = [
-  {
-    to: "/convert",
-    label: "Convert",
-    icon: FileText,
-  },
-  {
-    to: "/resume-analyzer",
-    label: "ATS Analyzer",
-    icon: FileSearch,
-  },
-  {
-    to: "/match",
-    label: "JD Match",
-    icon: GitCompare,
-  },
-];
+// const navItems = [
+//   {
+//     to: "/convert",
+//     label: "Convert",
+//     icon: FileText,
+//   },
+//   {
+//     to: "/resume-analyzer",
+//     label: "ATS Analyzer",
+//     icon: FileSearch,
+//   },
+//   {
+//     to: "/match",
+//     label: "JD Match",
+//     icon: GitCompare,
+//   },
+// ];
 
 // const handleAddCredit = async () => {
 //   const res = await fetch("http://localhost:8000/admin/add-credits?amount=10", {
@@ -45,7 +45,7 @@ export default function ServiceNav() {
           Add Credit +10
         </button> */}
         <div className="flex items-center gap-6 h-14">
-          {navItems.map(({ to, label, icon: Icon }) => (
+          {/* {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -64,7 +64,7 @@ export default function ServiceNav() {
               <Icon className="h-4 w-4" />
               <span className="hidden sm:inline">{label}</span>
             </NavLink>
-          ))}
+          ))} */}
         </div>
       </div>
     </nav>

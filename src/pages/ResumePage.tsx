@@ -16,27 +16,31 @@ import ImprovementsList, {
 } from "../components/ImprovementsList";
 import StatusIndicator from "../components/StatusIndicator";
 import toast from "react-hot-toast";
-import { fetchServiceQuota } from "../api/quotaApi";
+
+import ScoreBreakdown from "../components/ScoreBreakdown";
+import LoginModal from "../components/Modals/FeatureAccessModal";
+import { trackEvent } from "../api/analyticsApi";
 
 const MAX_FILE_SIZE_MB = 5;
 type result = {
   ats_score: number;
+  strength_level: string;
   issues: string[];
   optimization_tips: string[];
   breakdown: {
-    sections: number;
-    skills: number;
-    experience: number;
+    structure: number;
     length: number;
+    experience_quality: number;
+    impact: number;
+    skills: number;
+    clarity: number;
   };
   suggestion_source: string;
   ai_suggestions: {
     suggestions: Suggestion[];
     rewritten_bullets: string[];
     missing_keywords: string[];
-
-    severity: string;
-  };
+  } | null;
 };
 
 type data = {
@@ -46,13 +50,7 @@ type data = {
   error: string;
 };
 type Phase = "idle" | "ready" | "running" | "done";
-type UsageState = {
-  remaining_free: number;
-  daily_limit: number;
-  credits_left: number;
-  can_run: boolean;
-};
-type UpgradeReason = "quota_exhausted" | "unlock_ai" | "confirm_credit";
+
 export default function ResumePage() {
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(
     null,
@@ -64,13 +62,10 @@ export default function ResumePage() {
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [usage, setUsage] = useState<UsageState | null>(null);
-
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeReason, setUpgradeReason] = useState<UpgradeReason | null>(
-    null,
-  );
-
+  const [loginModal, setLoginModal] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<
+    "ai_resume" | "jd_match"
+  >("ai_resume");
   // ---------------- RESET ----------------
   const resetJob = () => {
     setJobId(null);
@@ -114,27 +109,8 @@ export default function ResumePage() {
 
   // ---------------- UPLOAD ----------------
 
-  const handleUpload = async (useCredit = false) => {
+  const handleUpload = async () => {
     if (!selectedFile) return;
-
-    // 🚫 BLOCKED: no free + no credits
-    if (usage && usage.remaining_free === 0 && usage.credits_left === 0) {
-      setUpgradeReason("quota_exhausted");
-      setShowUpgradeModal(true);
-      return;
-    }
-
-    // ⚠️ Free exhausted, credits available → confirmation
-    if (
-      usage &&
-      usage.remaining_free === 0 &&
-      usage.credits_left > 0 &&
-      !useCredit
-    ) {
-      setUpgradeReason("confirm_credit");
-      setShowUpgradeModal(true);
-      return;
-    }
 
     setIsUploading(true);
     setStatus("uploading");
@@ -142,13 +118,26 @@ export default function ResumePage() {
     setPhase("running");
 
     try {
-      const data = await startResumeAnalyzation(selectedFile, useCredit);
+      const data = await startResumeAnalyzation(selectedFile);
+
       setJobId(data.job_id);
       setStatus(data.status);
+    } catch (err) {
+      const apiError = err as Error & { status?: number };
 
-      if (data.usage) {
-        setUsage((prev) => ({ ...prev!, ...data.usage }));
+      if (apiError.status === 429) {
+        setError(
+          "You’ve reached today’s free resume analysis limit. Please try again tomorrow.",
+        );
+      } else {
+        setError(
+          apiError.message ||
+            "Failed to analyze your resume. Please try again.",
+        );
       }
+
+      setStatus(null);
+      setPhase("ready");
     } finally {
       setIsUploading(false);
     }
@@ -171,7 +160,9 @@ export default function ResumePage() {
       }, 500);
     },
     onFailed: (data: data) => {
-      setError(data.error || "Conversion failed");
+      setError(data.error || "Resume analysis failed");
+      setStatus(null);
+      setPhase("ready");
     },
   });
 
@@ -192,30 +183,19 @@ export default function ResumePage() {
     localStorage.setItem("lastService", "resume");
   }, []);
 
-  const canRun = usage?.can_run ?? false;
-  const buttonText = isJobRunning
-    ? "Analyzing..."
-    : !canRun || (usage!.remaining_free === 0 && usage!.credits_left === 0)
-      ? "Upgrade to continue"
-      : usage!.remaining_free > 0
-        ? "Analyze Resume (Free)"
-        : "Analyze Resume (1 Credit)";
+  // const canRun = usage?.can_run ?? false;
+  const buttonText = isJobRunning ? "Analyzing..." : "Analyze Resume (Free)";
 
-  useEffect(() => {
-    async function loadUsage() {
-      const res = await fetchServiceQuota("resume");
-
-      setUsage(res);
-    }
-
-    loadUsage();
-  }, []);
-
-  const handleUpgradeModel = () => {
-    setUpgradeReason("unlock_ai");
-    setShowUpgradeModal(true);
+  const handleLogin = async (featureType: "ai_resume" | "jd_match") => {
+    await trackEvent({
+      event_name: "ai_feature_clicked",
+      feature: featureType,
+      source: "resume_page",
+    });
+    setSelectedFeature(featureType);
+    setLoginModal(true);
   };
-
+  const strengthLevel = result?.strength_level ?? "";
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-start gap-8">
@@ -226,14 +206,6 @@ export default function ResumePage() {
           <p className="mt-2 text-muted-foreground">
             Check how well your resume performs with applicant tracking systems
           </p>
-          {usage && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {usage.remaining_free} / {usage.daily_limit} free analyses left
-              today
-              {usage.credits_left > 0 &&
-                ` · ${usage.credits_left} credits available`}
-            </p>
-          )}
         </div>
         <div className="w-full max-w-2xl rounded-xl bg-white border border-gray-50 shadow-sm">
           {!selectedFile ? (
@@ -263,49 +235,10 @@ export default function ResumePage() {
                       )
                     }
                     buttonText={buttonText}
-                    handleClick={() => handleUpload(false)}
+                    handleClick={() => handleUpload()}
                     isDisabled={isJobRunning}
                     type="cta"
                   />
-                  {usage &&
-                  usage?.remaining_free > 0 &&
-                  usage?.credits_left === 0 ? (
-                    <>
-                      <p className="mt-2 text-xs text-muted-foreground text-center">
-                        Want deeper insights with AI assistance?{" "}
-                        <button
-                          className="text-primary underline"
-                          onClick={() => handleUpgradeModel()}
-                        >
-                          Upgrade to unlock AI features
-                        </button>
-                      </p>
-                      <p className="mt-2 text-[11px] text-muted-foreground text-center">
-                        AI suggestions are applied when available.
-                      </p>
-                    </>
-                  ) : null}
-                  {usage &&
-                  usage?.remaining_free > 0 &&
-                  usage?.credits_left > 0 ? (
-                    <>
-                      <p className="mt-2 text-xs text-muted-foreground text-center">
-                        Want AI-assisted insights on this resume?{" "}
-                        <button
-                          className="text-primary underline"
-                          onClick={() => {
-                            setShowUpgradeModal(false);
-                            handleUpload(true); // 🔥 retry with credit
-                          }}
-                        >
-                          Use 1 credit
-                        </button>
-                      </p>
-                      <p className="mt-2 text-[11px] text-muted-foreground text-center">
-                        AI suggestions are applied when available.
-                      </p>
-                    </>
-                  ) : null}
                 </>
               )}
             </div>
@@ -321,20 +254,16 @@ export default function ResumePage() {
       opacity-0 translate-y-6
       animate-fade-in-up"
           >
-            <ATSScoreCard score={result?.ats_score} />{" "}
-            <p className="text-sm opacity-70">
-              Suggestions source:{" "}
-              <span className="font-semibold">
-                {result.suggestion_source === "ai"
-                  ? "AI-assisted"
-                  : "Rule-based"}
-              </span>
-            </p>
+            <ATSScoreCard
+              score={result?.ats_score}
+              strengthLevel={strengthLevel}
+            />{" "}
+            <ScoreBreakdown breakdown={result?.breakdown} />
             <ImprovementsList
-              suggestions={result.ai_suggestions.suggestions}
-              rewrittenBullets={result.ai_suggestions.rewritten_bullets}
-              missingKeywords={result.ai_suggestions.missing_keywords}
-              optimizationTips={result.optimization_tips}
+              suggestions={result.ai_suggestions?.suggestions ?? []}
+              rewrittenBullets={result.ai_suggestions?.rewritten_bullets ?? []}
+              missingKeywords={result.ai_suggestions?.missing_keywords ?? []}
+              optimizationTips={result.optimization_tips ?? []}
             />
             <button
               onClick={removeFile}
@@ -342,63 +271,65 @@ export default function ResumePage() {
             >
               Analyze another resume
             </button>
-          </div>
-        ) : null}
+            <div className="w-full max-w-2xl rounded-xl border border-gray-100 bg-white shadow-sm p-5">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Next Step
+                  </p>
 
-        {showUpgradeModal && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg text-center">
-              <h3 className="text-lg font-semibold mb-2">
-                {upgradeReason === "quota_exhausted" &&
-                  "Daily free limit reached"}
-                {upgradeReason === "unlock_ai" &&
-                  "Unlock AI-powered resume insights"}
-                {upgradeReason === "confirm_credit" &&
-                  "Use 1 credit for AI-assisted analysis?"}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                {upgradeReason === "quota_exhausted" &&
-                  "You’ve used all 3 free resume analyses for today."}
+                  <h3 className="mt-1 text-lg font-semibold text-foreground">
+                    Improve this resume with AI
+                  </h3>
 
-                {upgradeReason === "unlock_ai" &&
-                  "Unlock more analyses and AI-assisted insights with Applyra Pro."}
+                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                    Get deeper optimization suggestions, stronger bullet
+                    rewrites, and optional job-specific targeting.
+                  </p>
+                </div>
 
-                {upgradeReason === "confirm_credit" &&
-                  "Your free analyses for today are used up. This run will use 1 credit and include AI-assisted suggestions when available."}
-              </p>
+                <div className="grid gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-start gap-2">
+                    <span>•</span>
+                    <span>Rewrite weak experience bullet points</span>
+                  </div>
 
-              <div className="space-y-3">
-                {upgradeReason === "confirm_credit" && (
+                  <div className="flex items-start gap-2">
+                    <span>•</span>
+                    <span>Improve recruiter and ATS readability</span>
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <span>•</span>
+                    <span>Optimize resume for specific job descriptions</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <button
-                    className="w-full py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary/90"
-                    onClick={() => {
-                      setShowUpgradeModal(false);
-                      handleUpload(true); // 🔥 retry with credit
-                    }}
+                    className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition"
+                    onClick={() => handleLogin("ai_resume")}
                   >
-                    Use 1 Credit & Continue
+                    Continue with AI
                   </button>
-                )}
 
-                {upgradeReason !== "confirm_credit" && (
-                  <button className="w-full py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary/90">
-                    Upgrade to Continue (Coming Soon)
+                  <button
+                    className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium hover:bg-gray-50 transition"
+                    onClick={() => handleLogin("jd_match")}
+                  >
+                    Match Against Job Description
                   </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    setShowUpgradeModal(false);
-                  }}
-                  className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Maybe later
-                </button>
+                </div>
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
+        <LoginModal
+          isOpen={loginModal}
+          onClose={() => setLoginModal(false)}
+          feature={selectedFeature}
+        />
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">
           Powered by{" "}

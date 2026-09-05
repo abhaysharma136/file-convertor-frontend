@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ConvertPage from "./pages/ConvertPage";
+// import ConvertPage from "./pages/ConvertPage";
 import ResumePage from "./pages/ResumePage";
-import MatchPage from "./pages/MatchPage";
+// import MatchPage from "./pages/MatchPage";
 import HomePage from "./pages/HomePage";
 import { Toaster } from "react-hot-toast";
 import Privacy from "./pages/Privacy";
@@ -15,9 +15,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/convert" element={<ConvertPage />} />
+          {/* <Route path="/convert" element={<ConvertPage />} /> */}
           <Route path="/resume-analyzer" element={<ResumePage />} />
-          <Route path="/match" element={<MatchPage />} />
+          {/* <Route path="/match" element={<MatchPage />} /> */}
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/trust" element={<Trust />} />
