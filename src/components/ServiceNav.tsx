@@ -1,31 +1,31 @@
-import { Link, NavLink } from "react-router-dom";
-import { FileText, FileSearch, GitCompare } from "lucide-react";
+import { Link } from "react-router-dom";
+// import { FileText, FileSearch, GitCompare } from "lucide-react";
 
-const navItems = [
-  {
-    to: "/convert",
-    label: "Convert",
-    icon: FileText,
-  },
-  {
-    to: "/resume-analyzer",
-    label: "ATS Analyzer",
-    icon: FileSearch,
-  },
-  {
-    to: "/match",
-    label: "JD Match",
-    icon: GitCompare,
-  },
-];
+// const navItems = [
+//   {
+//     to: "/convert",
+//     label: "Convert",
+//     icon: FileText,
+//   },
+//   {
+//     to: "/resume-analyzer",
+//     label: "ATS Analyzer",
+//     icon: FileSearch,
+//   },
+//   {
+//     to: "/match",
+//     label: "JD Match",
+//     icon: GitCompare,
+//   },
+// ];
 
-const handleAddCredit = async () => {
-  const res = await fetch("http://localhost:8000/admin/add-credits?amount=10", {
-    method: "POST",
-  });
-  const data = await res.json();
-  alert(data?.message);
-};
+// const handleAddCredit = async () => {
+//   const res = await fetch("http://localhost:8000/admin/add-credits?amount=10", {
+//     method: "POST",
+//   });
+//   const data = await res.json();
+//   alert(data?.message);
+// };
 export default function ServiceNav() {
   return (
     <nav className="w-full border-b border-gray-200 bg-white/10 sticky top-0 backdrop-blur-sm z-50">
