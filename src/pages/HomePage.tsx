@@ -1,4 +1,4 @@
-// import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ServiceCard from "../components/ServiceCard";
 import AppLayout from "../layouts/AppLayout";
 import { FileSearch, Shield, Zap, CheckCircle, Sparkles } from "lucide-react";
@@ -7,7 +7,8 @@ import Footer from "../components/Footer";
 import { useState } from "react";
 import FeatureAccessModal from "../components/Modals/FeatureAccessModal";
 import { trackEvent } from "../api/analyticsApi";
-import { useNavigate } from "react-router-dom";
+import SEO from "../components/SEO";
+
 const benefits = [
   { icon: Shield, text: "Secure & Private" },
   { icon: Zap, text: "Instant Results" },
@@ -29,6 +30,11 @@ export default function HomePage() {
   };
   return (
     <AppLayout>
+      <SEO
+        title="Free ATS Resume Checker & Resume Tools | Applyra"
+        description="Applyra helps job seekers analyze and improve their resumes. Get a free ATS analysis with insights into structure, skills, experience, impact, and clarity."
+        canonical="https://applyra.in/"
+      />
       <div className="flex flex-col gap-14 items-center text-center">
         {/* ---------------- HERO ---------------- */}
         <section className="max-w-3xl pt-6">
@@ -187,6 +193,18 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="mt-10 text-center">
+            <p className="text-sm text-muted-foreground">
+              Want to see how your resume performs?
+            </p>
+
+            <Link
+              to="/resume-analyzer"
+              className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
+            >
+              Try the free ATS resume checker →
+            </Link>
           </div>
         </section>
 

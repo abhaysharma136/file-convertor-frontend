@@ -20,6 +20,8 @@ import toast from "react-hot-toast";
 import ScoreBreakdown from "../components/ScoreBreakdown";
 import LoginModal from "../components/Modals/FeatureAccessModal";
 import { trackEvent } from "../api/analyticsApi";
+import SEO from "../components/SEO";
+import { Link } from "react-router-dom";
 
 const MAX_FILE_SIZE_MB = 5;
 type result = {
@@ -198,13 +200,19 @@ export default function ResumePage() {
   const strengthLevel = result?.strength_level ?? "";
   return (
     <AppLayout>
+      <SEO
+        title="Free ATS Resume Checker | Applyra"
+        description="Check your resume for ATS compatibility with a free ATS resume checker. Get an ATS score and actionable insights on structure, skills, experience, impact, and clarity."
+        canonical="https://applyra.in/resume-analyzer"
+      />
       <div className="flex flex-col items-center justify-start gap-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-semibold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground">
             Resume ATS Analyzer
-          </h2>
+          </h1>
           <p className="mt-2 text-muted-foreground">
-            Check how well your resume performs with applicant tracking systems
+            Upload your resume and get a free ATS score with insights into
+            structure, skills, experience, impact, and clarity.
           </p>
         </div>
         <div className="w-full max-w-2xl rounded-xl bg-white border border-gray-50 shadow-sm">
@@ -337,13 +345,13 @@ export default function ResumePage() {
         </p>
         <p className="text-center text-xs text-muted-foreground mt-1">
           Files are deleted within 30 minutes ·{" "}
-          <a href="/privacy" className="underline">
+          <Link to="/privacy" className="underline">
             Privacy
-          </a>{" "}
+          </Link>{" "}
           ·{" "}
-          <a href="/terms" className="underline">
+          <Link to="/terms" className="underline">
             Terms
-          </a>
+          </Link>
         </p>
       </div>
     </AppLayout>
