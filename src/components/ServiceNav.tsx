@@ -30,7 +30,7 @@ export default function ServiceNav() {
   return (
     <nav className="w-full border-b border-gray-200 bg-white/10 sticky top-0 backdrop-blur-sm z-50">
       <div className="mx-auto px-4 flex items-center justify-between">
-        <Link to="/">
+        <Link to="/" aria-label="Applyra home">
           <div className="flex items-center gap-2">
             {/* <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <FileSearch className="h-4 w-4 text-primary-foreground" />
